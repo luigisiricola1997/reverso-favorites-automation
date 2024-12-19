@@ -15,7 +15,7 @@ def search_words_on_reverso(file_path):
 
     # Configure browser options (use Brave or Chrome)
     options = webdriver.ChromeOptions()
-    options.binary_location = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
+    options.binary_location = r"C:\Users\Siricola\AppData\Local\BraveSoftware\Brave-Browser\Application\brave.exe"
 
     # Specify the path to ChromeDriver
     driver_path = "./chromedriver-win64/chromedriver.exe"  # Replace with your chromedriver path
