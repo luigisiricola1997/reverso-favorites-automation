@@ -1,2 +1,5 @@
 .env
-chromedriver-win64
+.venv/
+__pycache__/
+*.pyc
+*.png

@@ -1,49 +1,73 @@
+# reverso-favorites-automation
 
-# Reverso Favorites Automation
+Batch-add words to your [Reverso Context](https://context.reverso.net) favorites from a text file. Useful when you have a stack of new vocabulary from a book, podcast, or class and you do not want to click "save" 30 times by hand.
 
-This Python script automates the process of logging into Reverso, searching for words, and adding them to the favorites list. It uses Selenium WebDriver to interact with the Reverso website and can be run with either Brave or Chrome browser.
+## Who is this for
 
-## Prerequisites
+Language learners who already use Reverso Context as their vocabulary stash and want to script the boring part of growing it.
 
-1. **Python 3.x**: Ensure you have Python 3 or higher installed.
-2. **WebDriver**: ChromeDriver (for Chrome) or BraveDriver (for Brave) must be installed and accessible.
+## Quickstart
 
-## Setup
-
-1. Clone this repository or download the script.
-2. Create a `.env` file in the root directory of the project, and add your Reverso login credentials:
-    ```
-    REVERSO_USERNAME=your_username
-    REVERSO_PASSWORD=your_password
-    ```
-3. Install the required dependencies:
-    ```bash
-    pip install selenium python-dotenv
-    ```
-
-4. **Browser Options**:
-    - By default, the script is configured to use **Brave** browser. If you prefer to use **Google Chrome**, update the browser path in the script:
-      ```python
-      options.binary_location = r"C:\Path\To\Your\Chrome\Browser\chrome.exe"
-      ```
-    - Make sure to have either **Brave** or **Chrome** installed.
+```sh
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+playwright install chromium
+cp .env.example .env   # then edit with your Reverso credentials
+python reverso_translate.py words.txt
+```
 
 ## Usage
 
-Once everything is set up, place the words you want to search in a text file (e.g., `words.txt`). The script will:
-1. Log into Reverso using the credentials in the `.env` file.
-2. Search each word in `words.txt` on Reverso's context translation page.
-3. Add each found word to your favorites.
-
-Run the script with:
-```bash
-python reverso_translate.py
+```
+python reverso_translate.py [WORDS_FILE] [--lang-pair PAIR] [--headless|--no-headless] [--dry-run] [--delay SECONDS]
 ```
 
+Defaults: `words.txt`, `english-italian`, headless on, no dry-run, 2s between words.
+
+Examples:
+
+```sh
+# Default: read words.txt, english <-> italian, headless
+python reverso_translate.py
+
+# Other language pair, with the browser visible (handy for debugging)
+python reverso_translate.py my-words.txt --lang-pair english-french --no-headless
+
+# Dry-run: visit each page and verify the favorite button is found, but do not click
+python reverso_translate.py --dry-run
+
+# Slow it down to be polite
+python reverso_translate.py --delay 5
+```
+
+The script prints a per-word OK/FAIL line and a summary at the end. Exit code:
+`0` all word added, `1` config/file errors, `2` login failed, `3` some words failed.
+
+## Words file format
+
+One word or phrase per line. Blank lines and duplicates are skipped automatically.
+
+```
+stall
+to be squashed
+to feel numb
+oven
+```
+
+## How it works
+
+Playwright opens a Chromium browser (headless by default), logs into Reverso using credentials from `.env`, then for each word visits `context.reverso.net/translation/<lang-pair>/<word>` and clicks the favorite button. Two consecutive clicks are needed because the Reverso UI requires it (observed empirically; if it stops working, re-record with `playwright codegen`).
+
 ## Notes
-- This script automatically handles the login process and adds each word to the favorites.
-- You can modify the script to customize the behavior or adapt it for other use cases.
+
+- This is a personal-use script.
+- Do not point it at huge word lists: keep it to a few dozen words at a time, leave the default `--delay`, and respect Reverso's terms of service.
+  The script is not affiliated with Reverso.
+- Headless mode works on Linux/macOS/Windows.
+  WSL2 works.
+- Credentials live in `.env` (gitignored).
+  Use `.env.example` as a template.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT. See [LICENSE](LICENSE).
